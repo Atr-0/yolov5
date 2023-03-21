@@ -19,7 +19,7 @@ from models.common import DetectMultiBackend
 from models.experimental import attempt_download, attempt_load  # scoped to avoid circular import
 from utils.augmentations import (Albumentations, augment_hsv, classify_albumentations, classify_transforms, copy_paste,
                                  letterbox, mixup, random_perspective)
-cmd,aqujieguo = "",""
+cmd, aqujieguo = "", ""
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[0]  # YOLOv5 root directory
 if str(ROOT) not in sys.path:
@@ -59,7 +59,7 @@ def aqu_pub(zhilin):
 
 def run_webcam(save_path, shibie_subscriber, img_size=640, stride=32, augment=False, visualize=False):
 
-    weights = r'/home/zzb/yolov5/aqubest.pt'
+    weights = r'/home/zzb/yolov5/myModels/aqubest.pt'
     device = 'cpu'
     w = str(weights[0] if isinstance(weights, list) else weights)
     # 导入模型
@@ -68,7 +68,7 @@ def run_webcam(save_path, shibie_subscriber, img_size=640, stride=32, augment=Fa
     names = model.names
 
     # 读取视频对象: 0 表示打开本地摄像头
-    cap = cv2.VideoCapture(4) 
+    cap = cv2.VideoCapture(4)
 
     # 获取当前视频的帧率与宽高，设置同样的格式，以确保相同帧率与宽高的视频输出
     ret_val, img0 = cap.read()
@@ -78,21 +78,15 @@ def run_webcam(save_path, shibie_subscriber, img_size=640, stride=32, augment=Fa
     # 按q退出循环
     while True:
         ret_val, img0 = cap.read()
-        # img0 = cv2.imread("/home/z/yolov5/1.jpg")
         wait = cv2.waitKey(30)
         if wait == ord('q'):
             cap.release()
             cv2.destroyAllWindows()
-            break
-        # cv2.imshow('web', img0)
-        # cv2.waitKey(1)
         if not ret_val:
             break
         rclpy.spin_once(shibie_subscriber, timeout_sec=0.1)
-        # print(f'video {frame} {save_path}')
         rclpy.spin_once(shibie_subscriber, timeout_sec=0.1)
-        global cmd,aqujieguo
-
+        global cmd, aqujieguo
 
         if cmd == "n":
             print("Amode jieshu")
@@ -147,7 +141,6 @@ def run_webcam(save_path, shibie_subscriber, img_size=640, stride=32, augment=Fa
 def main(args=None):
     # rclpy.init()
     shibie_subscriber = shibieSubscriber()
-    # Aqu_Publisher = AquPublisher()
     global cmd
     while rclpy.ok():
         rclpy.spin_once(shibie_subscriber, timeout_sec=0.1)
@@ -157,18 +150,6 @@ def main(args=None):
             run_webcam("/home/zzb/yolov5/test.mp4", shibie_subscriber)
         if cmd == "f":
             break
-        # elif cmd == "f":
-        #     print("a mode jieshu")
-        #     break
-        # while 1:
-        #     rclpy.spin_once(shibie_subscriber)
-        #     if cmd == "y":
-        #         print("aqu shibiezhong")
-        #         cmd = ""
-        #     elif cmd == "f":
-        #         print("a mode jieshu")
-        #         break
-        #     time.sleep(0.1)
     time.sleep(0.1)
     # Destroy the node explicitly
     # (optional - otherwise it will be done automatically
@@ -180,4 +161,3 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
-

@@ -112,7 +112,7 @@ def run_webcam(save_path, shibie_subscriber, img_size=640, stride=32, augment=Fa
             pred = model(img, augment=augment, visualize=visualize)[0]
             pred = non_max_suppression(pred, conf_thres=0.25, iou_thres=0.45, max_det=1000)
 
-            # plot label
+            # plot labels
             det = pred[0]
             annotator = Annotator(img0.copy(), line_width=3, example=str(names))
             if len(det):

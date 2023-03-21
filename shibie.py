@@ -58,6 +58,7 @@ def aqu_pub(zhilin):
 
 
 def run_webcam(save_path, shibie_subscriber, img_size=640, stride=32, augment=False, visualize=False):
+    global cmd
     if cmd == "a":
         weights = r'/home/zzb/yolov5/myModels/aqubest.pt'
     else:
@@ -88,7 +89,7 @@ def run_webcam(save_path, shibie_subscriber, img_size=640, stride=32, augment=Fa
             break
         rclpy.spin_once(shibie_subscriber, timeout_sec=0.1)
         rclpy.spin_once(shibie_subscriber, timeout_sec=0.1)
-        global cmd, aqujieguo, cqujieguo, dqujieguo
+        global aqujieguo, cqujieguo, dqujieguo
 
         if cmd == "n":
             print("Amode jieshu")

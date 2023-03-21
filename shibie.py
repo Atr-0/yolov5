@@ -19,7 +19,7 @@ from models.common import DetectMultiBackend
 from models.experimental import attempt_download, attempt_load  # scoped to avoid circular import
 from utils.augmentations import (Albumentations, augment_hsv, classify_albumentations, classify_transforms, copy_paste,
                                  letterbox, mixup, random_perspective)
-cmd, aqujieguo, cqujieguo, dqujieguo = "", "", "", ""
+cmd, jieguo, = "", "",
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[0]  # YOLOv5 root directory
 if str(ROOT) not in sys.path:
@@ -89,7 +89,7 @@ def run_webcam(save_path, shibie_subscriber, img_size=640, stride=32, augment=Fa
             break
         rclpy.spin_once(shibie_subscriber, timeout_sec=0.1)
         rclpy.spin_once(shibie_subscriber, timeout_sec=0.1)
-        global aqujieguo, cqujieguo, dqujieguo
+        global jieguo
 
         if cmd == "n":
             print("Amode jieshu")
@@ -97,7 +97,7 @@ def run_webcam(save_path, shibie_subscriber, img_size=640, stride=32, augment=Fa
             cap.release()
             break
         else:
-            aqujieguo, cqujieguo, dqujieguo = "", "", ""
+            jieguo = ""
             # Padded resize
             img = letterbox(img0, img_size, stride=stride, auto=True)[0]
 
@@ -123,22 +123,22 @@ def run_webcam(save_path, shibie_subscriber, img_size=640, stride=32, augment=Fa
                     if conf > 0.7:
                         if cmd == "a":
                             if xyxy[1] > 0.7:
-                                aqujieguo = aqujieguo + str(c)
+                                jieguo = jieguo + str(c)
                             else:
-                                aqujieguo = str(c) + aqujieguo
+                                jieguo = str(c) + jieguo
                             label = f'{names[c]} {conf:.2f}'
                             annotator.box_label(xyxy, label, color=colors(c, True))
                         elif cmd == "c":
                             if xyxy[1] > 0.7:
-                                cqujieguo = cqujieguo + "0"
+                                jieguo = jieguo + "0"
                             else:
-                                cqujieguo = "1" + cqujieguo
+                                jieguo = "1" + jieguo
                             label = f'{names[c]} {conf:.2f}'
                             annotator.box_label(xyxy, label, color=colors(c, True))
 
                             # write video
             im0 = annotator.result()
-            aqu_pub(aqujieguo)
+            aqu_pub(jieguo)
             cv2.imshow('webcam:0', im0)
             cv2.waitKey(1)
             vid_writer.write(im0)
@@ -155,8 +155,8 @@ def main(args=None):
     global cmd
     while rclpy.ok():
         rclpy.spin_once(shibie_subscriber, timeout_sec=0.1)
-        aqu_pub(aqujieguo)
-        if cmd == "a" or cmd == "c" or cmd == "d":
+        aqu_pub(jieguo)
+        if cmd == "a" or cmd == "c":
             run_webcam("/home/zzb/yolov5/test.mp4", shibie_subscriber)
         if cmd == "f":
             break

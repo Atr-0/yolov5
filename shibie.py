@@ -58,8 +58,10 @@ def aqu_pub(zhilin):
 
 
 def run_webcam(save_path, shibie_subscriber, img_size=640, stride=32, augment=False, visualize=False):
-
-    weights = r'/home/zzb/yolov5/myModels/aqubest.pt'
+    if cmd == "a":
+        weights = r'/home/zzb/yolov5/myModels/aqubest.pt'
+    else:
+        weights = r'/home/zzb/yolov5/myModels/cqu.pt'
     device = 'cpu'
     w = str(weights[0] if isinstance(weights, list) else weights)
     # 导入模型
@@ -129,7 +131,7 @@ def run_webcam(save_path, shibie_subscriber, img_size=640, stride=32, augment=Fa
                             if xyxy[1] > 0.7:
                                 cqujieguo = cqujieguo + "0"
                             else:
-                                cqujieguo = cqujieguo + "1"
+                                cqujieguo = "1" + cqujieguo
                             label = f'{names[c]} {conf:.2f}'
                             annotator.box_label(xyxy, label, color=colors(c, True))
 

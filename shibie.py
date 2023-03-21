@@ -19,7 +19,7 @@ from models.common import DetectMultiBackend
 from models.experimental import attempt_download, attempt_load  # scoped to avoid circular import
 from utils.augmentations import (Albumentations, augment_hsv, classify_albumentations, classify_transforms, copy_paste,
                                  letterbox, mixup, random_perspective)
-cmd, aqujieguo = "", ""
+cmd, aqujieguo, cqujieguo, dqujieguo = "", "", "", ""
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[0]  # YOLOv5 root directory
 if str(ROOT) not in sys.path:
@@ -86,7 +86,7 @@ def run_webcam(save_path, shibie_subscriber, img_size=640, stride=32, augment=Fa
             break
         rclpy.spin_once(shibie_subscriber, timeout_sec=0.1)
         rclpy.spin_once(shibie_subscriber, timeout_sec=0.1)
-        global cmd, aqujieguo
+        global cmd, aqujieguo, cqujieguo, dqujieguo
 
         if cmd == "n":
             print("Amode jieshu")
@@ -94,7 +94,7 @@ def run_webcam(save_path, shibie_subscriber, img_size=640, stride=32, augment=Fa
             cap.release()
             break
         else:
-            aqujieguo = ""
+            aqujieguo, cqujieguo, dqujieguo = "", "", ""
             # Padded resize
             img = letterbox(img0, img_size, stride=stride, auto=True)[0]
 
@@ -117,15 +117,23 @@ def run_webcam(save_path, shibie_subscriber, img_size=640, stride=32, augment=Fa
                 det[:, :4] = scale_boxes(img.shape[2:], det[:, :4], img0.shape).round()
                 for *xyxy, conf, cls in reversed(det):
                     c = int(cls)  # integer class
-                    if conf > 0.7 and cls == 1:
-                        if xyxy[1] > 0.7:
-                            aqujieguo = aqujieguo + str(c)
-                        else:
-                            aqujieguo = str(c) + aqujieguo
-                        label = f'{names[c]} {conf:.2f}'
-                        annotator.box_label(xyxy, label, color=colors(c, True))
+                    if conf > 0.7:
+                        if cmd == "a":
+                            if xyxy[1] > 0.7:
+                                aqujieguo = aqujieguo + str(c)
+                            else:
+                                aqujieguo = str(c) + aqujieguo
+                            label = f'{names[c]} {conf:.2f}'
+                            annotator.box_label(xyxy, label, color=colors(c, True))
+                        elif cmd == "c":
+                            if xyxy[1] > 0.7:
+                                cqujieguo = cqujieguo + "0"
+                            else:
+                                cqujieguo = cqujieguo + "1"
+                            label = f'{names[c]} {conf:.2f}'
+                            annotator.box_label(xyxy, label, color=colors(c, True))
 
-            # write video
+                            # write video
             im0 = annotator.result()
             aqu_pub(aqujieguo)
             cv2.imshow('webcam:0', im0)
@@ -145,8 +153,7 @@ def main(args=None):
     while rclpy.ok():
         rclpy.spin_once(shibie_subscriber, timeout_sec=0.1)
         aqu_pub(aqujieguo)
-        if cmd == "a":
-            print("a mode")
+        if cmd == "a" or cmd == "c" or cmd == "d":
             run_webcam("/home/zzb/yolov5/test.mp4", shibie_subscriber)
         if cmd == "f":
             break

@@ -122,7 +122,7 @@ def run_webcam(save_path, shibie_subscriber, img_size=640, stride=32, augment=Fa
                 det[:, :4] = scale_boxes(img.shape[2:], det[:, :4], img0.shape).round()
                 for *xyxy, conf, cls in reversed(det):
                     c = int(cls)  # integer class
-                    if conf > 0.7:
+                    if conf > 0.78:
                         if cmd == "a":
                             print(xyxy)
                             if xyxy[3] < 240:

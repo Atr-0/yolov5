@@ -61,8 +61,10 @@ def run_webcam(save_path, shibie_subscriber, img_size=640, stride=32, augment=Fa
     global cmd
     if cmd == "a":
         weights = r'/home/zzb/yolov5/myModels/aqubest.pt'
-    else:
+    elif cmd == "c":
         weights = r'/home/zzb/yolov5/myModels/cqu.pt'
+    elif cmd == "d":
+        weights = r'/home/zzb/yolov5/myModels/dqu.pt'
     device = 'cpu'
     w = str(weights[0] if isinstance(weights, list) else weights)
     # 导入模型
@@ -122,7 +124,8 @@ def run_webcam(save_path, shibie_subscriber, img_size=640, stride=32, augment=Fa
                     c = int(cls)  # integer class
                     if conf > 0.7:
                         if cmd == "a":
-                            if xyxy[1] > 0.7:
+                            print(xyxy)
+                            if xyxy[3] < 240:
                                 jieguo = jieguo + str(c)
                             else:
                                 jieguo = str(c) + jieguo
@@ -130,12 +133,22 @@ def run_webcam(save_path, shibie_subscriber, img_size=640, stride=32, augment=Fa
                             annotator.box_label(xyxy, label, color=colors(c, True))
                         elif cmd == "c":
                             print(xyxy)
-                            if xyxy[1] < 280:
+                            if xyxy[3] < 240:
                                 # 上
                                 jieguo = "0" + jieguo
                             else:
                                 # 下
                                 jieguo = jieguo + "1"
+                            label = f'{names[c]} {conf:.2f}'
+                            annotator.box_label(xyxy, label, color=colors(c, True))
+                        elif cmd == "d":
+                            print(xyxy)
+                            if xyxy[3] < 240:
+                                # 上
+                                jieguo = str(c + 1) + jieguo
+                            else:
+                                # 下
+                                jieguo = jieguo + str(c + 1)
                             label = f'{names[c]} {conf:.2f}'
                             annotator.box_label(xyxy, label, color=colors(c, True))
 
@@ -159,11 +172,12 @@ def main(args=None):
     while rclpy.ok():
         rclpy.spin_once(shibie_subscriber, timeout_sec=0.1)
         aqu_pub(jieguo)
-        if cmd == "a" or cmd == "c":
+        if cmd == "a" or cmd == "c" or cmd == "d":
             run_webcam("/home/zzb/yolov5/test.mp4", shibie_subscriber)
         if cmd == "f":
             break
     time.sleep(0.1)
+    # run_webcam("/home/zzb/yolov5/test.mp4", shibie_subscriber)
     # Destroy the node explicitly
     # (optional - otherwise it will be done automatically
     # when the garbage collector destroys the node object)

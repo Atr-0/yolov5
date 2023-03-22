@@ -131,8 +131,10 @@ def run_webcam(save_path, shibie_subscriber, img_size=640, stride=32, augment=Fa
                         elif cmd == "c":
                             print(xyxy)
                             if xyxy[1] < 280:
+                                # 上
                                 jieguo = "0" + jieguo
                             else:
+                                # 下
                                 jieguo = jieguo + "1"
                             label = f'{names[c]} {conf:.2f}'
                             annotator.box_label(xyxy, label, color=colors(c, True))

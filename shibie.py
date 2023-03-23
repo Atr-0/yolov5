@@ -1,24 +1,30 @@
-from std_msgs.msg import String
-import time
-from rclpy.node import Node
-import rclpy
-import argparse
-import os
-import platform
-import sys
-from pathlib import Path
-import numpy as np
-import torch
-import cv2
 from utils.torch_utils import select_device, smart_inference_mode
 from utils.plots import Annotator, colors, save_one_box
-from utils.general import (LOGGER, Profile, check_file, check_img_size, check_imshow, check_requirements, colorstr,
+from utils.general import (LOGGER, Profile, check_file, check_img_size, check_imshow, check_requirements, colorstr, cv2,
                            increment_path, non_max_suppression, print_args, scale_boxes, strip_optimizer, xyxy2xywh)
 from utils.dataloaders import IMG_FORMATS, VID_FORMATS, LoadImages, LoadScreenshots, LoadStreams
 from models.common import DetectMultiBackend
 from models.experimental import attempt_download, attempt_load  # scoped to avoid circular import
 from utils.augmentations import (Albumentations, augment_hsv, classify_albumentations, classify_transforms, copy_paste,
                                  letterbox, mixup, random_perspective)
+from image_similarity import *
+from typing import List
+import cv2
+import simcal
+import torch
+import numpy as np
+from pathlib import Path
+from keras.applications.imagenet_utils import preprocess_input
+from keras.utils import image_utils as image
+import sys
+import platform
+import os
+import argparse
+import rclpy
+from rclpy.node import Node
+import time
+from std_msgs.msg import String
+
 cmd, jieguo, = "", "",
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[0]  # YOLOv5 root directory

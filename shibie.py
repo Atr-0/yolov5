@@ -248,7 +248,7 @@ def get_score(image1_rgb, image2_rgb, naed, ssim, cosine):
     return total_percent
 
 
-def run_bqun(save_path, shibie_subscriber, Aqu_Publisher, img_size=640, stride=32, augment=False, visualize=False):
+def run_bqun(save_path, shibie_subscriber, img_size=640, stride=32, augment=False, visualize=False):
 
     weights = r'/home/zzb/yolov5/bqu.pt'
     device = 'cpu'
@@ -270,7 +270,7 @@ def run_bqun(save_path, shibie_subscriber, Aqu_Publisher, img_size=640, stride=3
     # 按q退出循环
     while True:
         ret_val, img0 = cap.read()
-        img0 = cv2.imread("/home/zzb/train/WIN_20230321_11_14_52_Pro.jpg")
+        img0 = cv2.imread("/home/zzb/yolov5/1.jpg")
         # img0=cv2.imread("/home/zzb/train/WIN_20230321_10_02_42_Pro.jpg")
         if cv2.waitKey(1) == ord('q'):
             cap.release()
@@ -382,24 +382,10 @@ def run_bqun(save_path, shibie_subscriber, Aqu_Publisher, img_size=640, stride=3
                     print("xiacengyiwu" + str(yingshe[simlist.index(max(simlist))]))
                 else:
                     print("xiacengzhengchang")
-                # for i in range(1,-2,-1):
-                #     tmp0=img0[int(down[i][1]):int(down[i][3]),int(down[i][0]):int(down[i][2])]
-                #     tmp1=img0[int(down[i+1][1]):int(down[i+1][3]),int(down[i+1][0]):int(down[i+1][2])]
-                #     cv2.imwrite("/home/zzb/yolov5/d"+str(i)+str(1)+".jpg",tmp0)
-                #     tmp0 = cv2.resize(tmp0, (100, 100), interpolation=cv2.INTER_AREA)
-                #     cv2.imwrite("/home/zzb/yolov5/d"+str(i)+str(2)+".jpg",tmp1)
-                #     tmp1 = cv2.resize(tmp1, (100, 100), interpolation=cv2.INTER_AREA)
-                #     print(get_score(tmp0,tmp1,1,1,1))
-                    # ss = calculate_ssim(tmp0, tmp1)
-                    # print(ss)
-                # cv2.imwrite("/home/zzb/yolov5/ert.jpg",tmp0)
-                # tmp1=img0[up[1]]
-                # tmp2=img0[up[2]]
-                # ss = calculate_ssim(tmp0, tmp1)
                 time.sleep(10)
             # write video
             im0 = annotator.result()
-            Aqu_Publisher.pub(Aqujieguo)
+            # Aqu_Publisher.pub(Aqujieguo)
             cv2.imshow('webcam:0', im0)
             cv2.waitKey(1)
 
@@ -416,13 +402,14 @@ def main(args=None):
     # rclpy.init()
     shibie_subscriber = shibieSubscriber()
     global cmd
-    while rclpy.ok():
-        rclpy.spin_once(shibie_subscriber, timeout_sec=0.1)
-        aqu_pub(jieguo)
-        if cmd == "a" or cmd == "c" or cmd == "d":
-            run_webcam("/home/zzb/yolov5/test.mp4", shibie_subscriber)
-        if cmd == "f":
-            break
+    run_bqun("/home/zzb/yolov5/test.mp4", shibie_subscriber)
+    # while rclpy.ok():
+    #     rclpy.spin_once(shibie_subscriber, timeout_sec=0.1)
+    #     aqu_pub(jieguo)
+    #     if cmd == "a" or cmd == "c" or cmd == "d":
+    #         run_webcam("/home/zzb/yolov5/test.mp4", shibie_subscriber)
+    #     if cmd == "f":
+    #         break
     time.sleep(0.1)
     # run_webcam("/home/zzb/yolov5/test.mp4", shibie_subscriber)
     # Destroy the node explicitly

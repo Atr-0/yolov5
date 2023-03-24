@@ -104,7 +104,7 @@ def run_webcam(save_path, shibie_subscriber, img_size=640, stride=32, augment=Fa
             vid_writer.release()
             cap.release()
             break
-        else:
+        elif cmd == "a" or cmd == "c" or cmd == "d":
             jieguo = ""
             # Padded resize
             img = letterbox(img0, img_size, stride=stride, auto=True)[0]
@@ -128,7 +128,7 @@ def run_webcam(save_path, shibie_subscriber, img_size=640, stride=32, augment=Fa
                 det[:, :4] = scale_boxes(img.shape[2:], det[:, :4], img0.shape).round()
                 for *xyxy, conf, cls in reversed(det):
                     c = int(cls)  # integer class
-                    if conf > 0.78:
+                    if conf > 0.72:
                         if cmd == "a":
                             print(xyxy)
                             if xyxy[3] < 300:
@@ -166,6 +166,7 @@ def run_webcam(save_path, shibie_subscriber, img_size=640, stride=32, augment=Fa
             cv2.imshow('webcam:0', im0)
             cv2.waitKey(1)
             vid_writer.write(im0)
+            cmd = ""
 
     # 按q退出循环
     vid_writer.release()
@@ -282,8 +283,8 @@ def run_bqun(save_path, shibie_subscriber, img_size=640, stride=32, augment=Fals
         rclpy.spin_once(shibie_subscriber, timeout_sec=0.05)
         # print(f'video {frame} {save_path}')
         if cmd == "b":
+            jieguo = ""
             # if cmd=="y":
-            cmd = ""
             # Padded resize
             img = letterbox(img0, img_size, stride=stride, auto=True)[0]
 
@@ -367,13 +368,13 @@ def run_bqun(save_path, shibie_subscriber, img_size=640, stride=32, augment=Fals
                     jieguo = jieguo + str(yingshe[simlist.index(max(simlist))])
                 else:
                     print("xiacengzhengchang")
-                time.sleep(10)
             # write video
             im0 = annotator.result()
+            aqu_pub(jieguo)
             # Aqu_Publisher.pub(Aqujieguo)
             cv2.imshow('webcam:0', im0)
             cv2.waitKey(1)
-
+            cmd = ""
             # vid_writer.write(im0)
         if cmd == "n":
             print("Amode jieshu")
@@ -387,14 +388,16 @@ def main(args=None):
     # rclpy.init()
     shibie_subscriber = shibieSubscriber()
     global cmd
-    run_bqun("/home/zzb/yolov5/test.mp4", shibie_subscriber)
-    # while rclpy.ok():
-    #     rclpy.spin_once(shibie_subscriber, timeout_sec=0.1)
-    #     aqu_pub(jieguo)
-    #     if cmd == "a" or cmd == "c" or cmd == "d":
-    #         run_webcam("/home/zzb/yolov5/test.mp4", shibie_subscriber)
-    #     if cmd == "f":
-    #         break
+
+    while rclpy.ok():
+        rclpy.spin_once(shibie_subscriber, timeout_sec=0.1)
+        aqu_pub(jieguo)
+        if cmd == "b":
+            run_bqun("/home/zzb/yolov5/test.mp4", shibie_subscriber)
+        if cmd == "a" or cmd == "c" or cmd == "d":
+            run_webcam("/home/zzb/yolov5/test.mp4", shibie_subscriber)
+        if cmd == "f":
+            break
     time.sleep(0.1)
     # run_webcam("/home/zzb/yolov5/test.mp4", shibie_subscriber)
     # Destroy the node explicitly

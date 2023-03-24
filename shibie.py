@@ -249,8 +249,8 @@ def get_score(image1_rgb, image2_rgb, naed, ssim, cosine):
 
 
 def run_bqun(save_path, shibie_subscriber, img_size=640, stride=32, augment=False, visualize=False):
-
-    weights = r'/home/zzb/yolov5/bqu.pt'
+    global cmd, jieguo
+    weights = r'/home/zzb/yolov5/myModels/bqu.pt'
     device = 'cpu'
     w = str(weights[0] if isinstance(weights, list) else weights)
     # 导入模型
@@ -259,34 +259,27 @@ def run_bqun(save_path, shibie_subscriber, img_size=640, stride=32, augment=Fals
     names = model.names
 
     # 读取视频对象: 0 表示打开本地摄像头
-    cap = cv2.VideoCapture(0)
-    frame = 0       # 开始处理的帧数
+    cap = cv2.VideoCapture(4)
 
     # 获取当前视频的帧率与宽高，设置同样的格式，以确保相同帧率与宽高的视频输出
     ret_val, img0 = cap.read()
-    fps, w, h = 30, img0.shape[1], img0.shape[0]
-    vid_writer = cv2.VideoWriter(save_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (w, h))
-    global gantama
+    fps, w, h = 30, int(cap.get(3)), int(cap.get(4))
+
+    vid_writer = cv2.VideoWriter(save_path, cv2.VideoWriter.fourcc('m', 'p', '4', 'v'), fps, (w, h))
     # 按q退出循环
     while True:
         ret_val, img0 = cap.read()
-        img0 = cv2.imread("/home/zzb/yolov5/1.jpg")
-        # img0=cv2.imread("/home/zzb/train/WIN_20230321_10_02_42_Pro.jpg")
-        if cv2.waitKey(1) == ord('q'):
+        wait = cv2.waitKey(30)
+        if wait == ord('q'):
             cap.release()
             cv2.destroyAllWindows()
-            break
         cv2.imshow('web', img0)
         cv2.waitKey(1)
         if not ret_val:
             break
-        frame += 1
         rclpy.spin_once(shibie_subscriber, timeout_sec=0.05)
         # print(f'video {frame} {save_path}')
-        rclpy.spin_once(shibie_subscriber, timeout_sec=0.1)
-        global cmd
-        Aqujieguo = ""
-        if 1:
+        if cmd == "b":
             # if cmd=="y":
             cmd = ""
             # Padded resize
@@ -325,8 +318,6 @@ def run_bqun(save_path, shibie_subscriber, img_size=640, stride=32, augment=Fals
             img_data_list = []
             if len(up) == 3:
                 print(up)
-                # print(int(up[0][1]*h),int(up[0][1]*h)+int(up[0][3]*h),int(up[0][0]*w),int(up[0][0]*w)+int(up[0][2]*w))
-                # tmp0=img0[int(up[0][1]*h):int(up[0][1]*h)+int(up[0][3]*h),int(up[0][0]*w):int(up[0][0]*w)+int(up[0][2]*w)]
                 tmp0 = img0[int(up[0][1]):int(up[0][3]), int(up[0][0]):int(up[0][2])]
                 for i in range(3):
                     tmp0 = img0[int(up[i][1]):int(up[i][3]), int(up[i][0]):int(up[i][2])]
@@ -345,22 +336,13 @@ def run_bqun(save_path, shibie_subscriber, img_size=640, stride=32, augment=Fals
                 print(simlist)
                 if max(simlist) - min(simlist) > 15:
                     print("shangcengyiwu" + str(yingshe[simlist.index(max(simlist))]))
+                    jieguo = str(yingshe[simlist.index(max(simlist))]) + jieguo
                 else:
                     print("shangchengzhengchang")
-                # for i in range(1,-2,-1):
-                #     tmp0=img0[int(up[i][1]):int(up[i][3]),int(up[i][0]):int(up[i][2])]
-                #     tmp1=img0[int(up[i+1][1]):int(up[i+1][3]),int(up[i+1][0]):int(up[i+1][2])]
-                #     cv2.imwrite("/home/zzb/yolov5/u"+str(i)+str(1)+".jpg",tmp0)
-                #     tmp0 = cv2.resize(tmp0, (100, 100), interpolation=cv2.INTER_AREA)
-                #     cv2.imwrite("/home/zzb/yolov5/u"+str(i)+str(2)+".jpg",tmp1)
-                #     tmp1 = cv2.resize(tmp1, (100, 100), interpolation=cv2.INTER_AREA)
-                #     print(get_score(tmp0,tmp1,1,1,1))
             down.sort(key=lambda x: x[0])
             img_data_list = []
             if len(down) == 3:
                 print(down)
-                # print(int(up[0][1]*h),int(up[0][1]*h)+int(up[0][3]*h),int(up[0][0]*w),int(up[0][0]*w)+int(up[0][2]*w))
-                # tmp0=img0[int(up[0][1]*h):int(up[0][1]*h)+int(up[0][3]*h),int(up[0][0]*w):int(up[0][0]*w)+int(up[0][2]*w)]
                 tmp0 = img0[int(down[0][1]):int(down[0][3]), int(down[0][0]):int(down[0][2])]
 
                 for i in range(3):
@@ -380,6 +362,7 @@ def run_bqun(save_path, shibie_subscriber, img_size=640, stride=32, augment=Fals
                 print(simlist)
                 if max(simlist) - min(simlist) > 15:
                     print("xiacengyiwu" + str(yingshe[simlist.index(max(simlist))]))
+                    jieguo = jieguo + str(yingshe[simlist.index(max(simlist))])
                 else:
                     print("xiacengzhengchang")
                 time.sleep(10)

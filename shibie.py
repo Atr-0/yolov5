@@ -161,12 +161,13 @@ def run_webcam(save_path, shibie_subscriber, img_size=640, stride=32, augment=Fa
                             annotator.box_label(xyxy, label, color=colors(c, True))
 
                             # write video
+                time.sleep(0.5)
             im0 = annotator.result()
             aqu_pub(jieguo)
             cv2.imshow('webcam:0', im0)
             cv2.waitKey(1)
             vid_writer.write(im0)
-            cmd = ""
+            cmd = "n"
 
     # 按q退出循环
     vid_writer.release()
@@ -276,9 +277,10 @@ def run_bqun(save_path, shibie_subscriber, img_size=640, stride=32, augment=Fals
         if wait == ord('q'):
             cap.release()
             cv2.destroyAllWindows()
-        cv2.imshow('web', img0)
+        # cv2.imshow('web', img0)
         cv2.waitKey(1)
         if not ret_val:
+            print("xxxxxxxxxxxxxxxxxxxxx")
             break
         rclpy.spin_once(shibie_subscriber, timeout_sec=0.05)
         # print(f'video {frame} {save_path}')
@@ -311,12 +313,15 @@ def run_bqun(save_path, shibie_subscriber, img_size=640, stride=32, augment=Fals
                 for *xyxy, conf, cls in reversed(det):
                     xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
                     c = int(cls)  # integer class
-                    if xyxy[1] > 300:
-                        down.append(xyxy)
-                    else:
-                        up.append(xyxy)
-                    label = f'{names[c]} {conf:.2f}' + str(xyxy[1])
-                    annotator.box_label(xyxy, label, color=colors(c, True))
+                    if conf > 0.6:
+                        if xyxy[3] < 300:
+                            up.append(xyxy)
+                        else:
+                            down.append(xyxy)
+                        label = f'{names[c]} {conf:.2f}' + str(xyxy[1])
+                        annotator.box_label(xyxy, label, color=colors(c, True))
+            im0 = annotator.result()
+            cv2.imshow('webcam:0', im0)
             up.sort(key=lambda x: x[0])
             img_data_list = []
             if len(up) == 3:
@@ -337,9 +342,9 @@ def run_bqun(save_path, shibie_subscriber, img_size=640, stride=32, augment=Fals
                     xiangsidu = simcal.SIM(img_data_list[i], img_data_list[i - 1])
                     simlist.append(xiangsidu)
                 print(simlist)
-                if max(simlist) - min(simlist) > 15:
+                if max(simlist) - min(simlist) > 10:
                     print("shangcengyiwu" + str(yingshe[simlist.index(max(simlist))]))
-                    jieguo = str(yingshe[simlist.index(max(simlist))]) + jieguo
+                    jieguo = "3" + str(yingshe[simlist.index(max(simlist))]) + jieguo
                 else:
                     print("shangchengzhengchang")
             down.sort(key=lambda x: x[0])
@@ -363,18 +368,19 @@ def run_bqun(save_path, shibie_subscriber, img_size=640, stride=32, augment=Fals
                     xiangsidu = simcal.SIM(img_data_list[i], img_data_list[i - 1])
                     simlist.append(xiangsidu)
                 print(simlist)
-                if max(simlist) - min(simlist) > 15:
+                if max(simlist) - min(simlist) > 10:
                     print("xiacengyiwu" + str(yingshe[simlist.index(max(simlist))]))
-                    jieguo = jieguo + str(yingshe[simlist.index(max(simlist))])
+                    jieguo = jieguo + str(yingshe[simlist.index(max(simlist))]) + "4"
                 else:
                     print("xiacengzhengchang")
+            time.sleep(1)
             # write video
-            im0 = annotator.result()
+
             aqu_pub(jieguo)
             # Aqu_Publisher.pub(Aqujieguo)
-            cv2.imshow('webcam:0', im0)
+
             cv2.waitKey(1)
-            cmd = ""
+            cmd = "n"
             # vid_writer.write(im0)
         if cmd == "n":
             print("Amode jieshu")
